@@ -20,8 +20,18 @@ function createToken(input){
     }
 }
 
+function verifyToken(token){
+    try {
+        return jwt.verify(token,serverConfig.JWT_SECTRET);
+    } catch (error) {
+        console.log(error);
+        throw error;
+    }
+}
+
 
 module.exports = {
     checkPass,
-    createToken
+    createToken,
+    verifyToken
 }
