@@ -7,9 +7,9 @@ const { SuccessResponse, ErrorResponse } = require('../utils/common');
 * req-body : {email: 'a@1', password:'1234'} 
 */
 
-async function CreateUser(req,res) {
+async function Singup(req,res) {
     try {
-        const city = await UserService.createUser({
+        const city = await UserService.SingUp({
             email : req.body.email,
             password : req.body.password
         });
@@ -25,6 +25,25 @@ async function CreateUser(req,res) {
     }
 }
 
+
+async function Singin(req,res) {
+    try {
+        const city = await UserService.SingIn({
+            email : req.body.email,
+            password : req.body.password
+        });
+        SuccessResponse.data = city;
+        return res
+                .status(StatusCodes.CREATED)
+                .json(SuccessResponse);
+    } catch (error) {
+        ErrorResponse.error = error;
+        return res
+            .status(error.statusCode)
+            .json(ErrorResponse);
+    }
+}
 module.exports = {
-    CreateUser
+    Singup,
+    Singin
 }
