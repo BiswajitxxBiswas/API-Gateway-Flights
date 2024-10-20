@@ -60,12 +60,16 @@ async function isAuthenticated(token) {
         return user.id;
 
     } catch (error) {
+        if(error.name == 'TokenExpiredError'){
+            throw new AppError(`JWT Token Has Expired`,StatusCodes.BAD_REQUEST);
+        }
 
         if(error instanceof AppError) throw error;
 
         if(error.name  == 'JsonWebTokenError'){
             throw new AppError(`Invalid JWT Token`,StatusCodes.BAD_REQUEST);
         }
+
     }
 }
 module.exports = {
