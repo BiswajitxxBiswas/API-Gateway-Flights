@@ -1,15 +1,20 @@
-const { UserRepository } = require('../repositories');
+const { UserRepository, RoleRepository } = require('../repositories');
 const AppError = require('../utils/errors/app-errors');
-const { Auth } = require('../utils/common');
+const { Auth, Enums } = require('../utils/common');
 const { StatusCodes } = require('http-status-codes');
 
 const userRepository = new UserRepository();
+const roleRepository = new RoleRepository();
 
 async function SingUp(data) {
     try {
+        console.log(`inside user Service `)
         const user = await userRepository.create(data);
+        const role = await roleRepository.getRoleByName(Enums.USER_ROLES_ENUM.CUSTOMER);
+        user.addRole(role);
         return user;
     } catch (error) {
+        console.log(`inside user Service`,error);
         if (error.name == 'SequelizeUniqueConstraintError' || error.name == 'SequelizeValidationError') {
             let explanation = [];
             error.errors.forEach((err) => {
@@ -39,6 +44,8 @@ async function SingIn(data){
         return jwt;
 
     } catch (error) {
+        console.log(error);
+
         if(error instanceof AppError) throw error;
         throw new AppError(`Something went wrong `, StatusCodes.INTERNAL_SERVER_ERROR);        
     }
