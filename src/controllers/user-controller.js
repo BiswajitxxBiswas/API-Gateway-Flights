@@ -9,11 +9,11 @@ const { SuccessResponse, ErrorResponse } = require('../utils/common');
 
 async function Singup(req,res) {
     try {
-        const city = await UserService.SingUp({
+        const user = await UserService.SingUp({
             email : req.body.email,
             password : req.body.password
         });
-        SuccessResponse.data = city;
+        SuccessResponse.data = user;
         return res
                 .status(StatusCodes.CREATED)
                 .json(SuccessResponse);
@@ -28,11 +28,11 @@ async function Singup(req,res) {
 
 async function Singin(req,res) {
     try {
-        const city = await UserService.SingIn({
+        const user = await UserService.SingIn({
             email : req.body.email,
             password : req.body.password
         });
-        SuccessResponse.data = city;
+        SuccessResponse.data = user;
         return res
                 .status(StatusCodes.CREATED)
                 .json(SuccessResponse);
@@ -43,7 +43,27 @@ async function Singin(req,res) {
             .json(ErrorResponse);
     }
 }
+
+async function addRoleToUser(req,res) {
+    try {
+        const user = await UserService.addRoletoUser({
+            id : req.body.id,
+            role : req.body.role,
+        });
+        SuccessResponse.data = user;
+        return res
+                .status(StatusCodes.CREATED)
+                .json(SuccessResponse);
+    } catch (error) {
+        ErrorResponse.error = error;
+        return res
+            .status(error.statusCode)
+            .json(ErrorResponse);
+    }
+}
+
 module.exports = {
     Singup,
-    Singin
+    Singin,
+    addRoleToUser
 }

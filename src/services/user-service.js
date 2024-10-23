@@ -8,13 +8,11 @@ const roleRepository = new RoleRepository();
 
 async function SingUp(data) {
     try {
-        console.log(`inside user Service `)
         const user = await userRepository.create(data);
         const role = await roleRepository.getRoleByName(Enums.USER_ROLES_ENUM.CUSTOMER);
         user.addRole(role);
         return user;
     } catch (error) {
-        console.log(`inside user Service`,error);
         if (error.name == 'SequelizeUniqueConstraintError' || error.name == 'SequelizeValidationError') {
             let explanation = [];
             error.errors.forEach((err) => {
@@ -44,8 +42,6 @@ async function SingIn(data){
         return jwt;
 
     } catch (error) {
-        console.log(error);
-
         if(error instanceof AppError) throw error;
         throw new AppError(`Something went wrong `, StatusCodes.INTERNAL_SERVER_ERROR);        
     }
@@ -79,8 +75,45 @@ async function isAuthenticated(token) {
 
     }
 }
+
+async function addRoletoUser(data){
+    try {
+        const user = await userRepository.get(data.id);
+        if(!user){
+            throw new AppError(`No user can be found for the given id`,StatusCodes.NOT_FOUND);
+        }
+        const role = await roleRepository.getRoleByName(data.role);
+        if(!role){
+            throw new AppError(`No role can be found for the given name`,StatusCodes.NOT_FOUND);
+        }
+        user.addRole(role);
+        return user;
+    } catch (error) {
+        if(error instanceof AppError) throw error;
+        throw new AppError('Cannot create a new User Object', StatusCodes.INTERNAL_SERVER_ERROR);
+    }
+}
+
+async function isAdmin(id) {
+    try {
+        const user = await userRepository.get(id);
+        if(!user){
+            throw new AppError(`No user can be found for the given id`,StatusCodes.NOT_FOUND);
+        }
+        const adminRole = await roleRepository.getRoleByName(Enums.USER_ROLES_ENUM.ADMIN);
+        if(!adminRole){
+            throw new AppError(`No user can be found for the given role`,StatusCodes.NOT_FOUND);
+        }
+        return user.hasRole(adminRole);
+    } catch (error) {
+        if(error instanceof AppError) throw error;
+        throw new AppError('Cannot create a new User Object', StatusCodes.INTERNAL_SERVER_ERROR);
+    }
+}
 module.exports = {
     SingUp,
     SingIn,
-    isAuthenticated
+    isAuthenticated,
+    addRoletoUser,
+    isAdmin
 }
